@@ -345,6 +345,45 @@
     .hamburger{width:44px;height:44px;font-size:24px}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── CASHLY AUTH ──
+const SUPABASE_URL  = 'https://zymvblvsuaeeslajgvgo.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5bXZibHZzdWFlZXNsYWpndmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NjM3MTYsImV4cCI6MjEwMTQzOTcxNn0.fyV1QPKAlryo-OOeGAvmkwjh1X93UgTrZzY4hl6subM';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Verificar sesión al cargar
+(async () => {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) {
+    window.location.href = '/login';
+    return;
+  }
+  // Guardar usuario globalmente
+  window.CASHLY_USER = session.user;
+  window.CASHLY_SESSION = session;
+
+  // Actualizar nombre en sidebar
+  const name = session.user.user_metadata?.full_name || 
+               session.user.email?.split('@')[0] || 'Usuario';
+  const email = session.user.email || '';
+  const avatar = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const nameEl = document.querySelector('.user-name');
+    const planEl = document.querySelector('.user-plan');
+    const avatEl = document.querySelector('.user-avatar');
+    if(nameEl) nameEl.textContent = name;
+    if(planEl) planEl.textContent = email;
+    if(avatEl) avatEl.textContent = avatar;
+  });
+})();
+
+async function cashlyLogout() {
+  await _sb.auth.signOut();
+  window.location.href = '/login';
+}
+</script>
 </head>
 <body>
 
@@ -407,11 +446,14 @@
   </div>
   <div class="sidebar-footer">
     <div class="user-chip">
-      <div class="user-avatar">JC</div>
-      <div>
-        <div class="user-name">Juan Castro</div>
-        <div class="user-plan">Plan Pro ✓</div>
+      <div class="user-avatar" style="cursor:default">JC</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name">Cargando...</div>
+        <div class="user-plan" style="font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
       </div>
+      <span title="Cerrar sesión" onclick="cashlyLogout()" 
+            style="font-size:16px;cursor:pointer;opacity:.6;flex-shrink:0;padding:4px"
+            onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">⏻</span>
     </div>
   </div>
 </nav>
@@ -6056,10 +6098,15 @@ function closeSidebar(){
 }
 
 // INIT
-document.addEventListener('DOMContentLoaded',()=>{
-  // Pantalla principal: Balance Personal
+document.addEventListener('DOMContentLoaded', async () => {
+  // Esperar a que auth esté listo
+  await new Promise(r => setTimeout(r, 800));
+
+  // Cargar datos reales del usuario desde Supabase
+  await loadUserData();
+
+  // Pantalla principal
   renderPatrimonio();
-  // Pre-cargar datos usados en dashboard y transacciones
   renderRecentTx();
   renderTxTable();
   renderTxKPIs();
@@ -6067,8 +6114,72 @@ document.addEventListener('DOMContentLoaded',()=>{
   renderCatGrid();
   renderTopGastos();
   renderNotif();
-  setTimeout(initCharts,100);
+  setTimeout(initCharts, 100);
 });
+
+// ── CARGAR DATOS DEL USUARIO DESDE SUPABASE ──
+async function loadUserData() {
+  if (!window._sb || !window.CASHLY_USER) return;
+  const uid = window.CASHLY_USER.id;
+
+  try {
+    // Transacciones
+    const { data: txData } = await _sb.from('transactions')
+      .select('*').eq('user_id', uid).order('date', { ascending: false }).limit(50);
+    if (txData && txData.length > 0) {
+      TRANSACTIONS.length = 0;
+      txData.forEach(t => TRANSACTIONS.push({
+        id: t.id, name: t.name, cat: t.category || 'Sin categoría',
+        icon: t.icon || '💳', date: new Date(t.date).toLocaleDateString('es-CL',{day:'numeric',month:'short'}),
+        amount: t.amount, status: t.status || 'ok',
+        type: t.type, badge: t.badge || 'badge-gray', prestamo: null
+      }));
+    }
+
+    // Presupuestos
+    const { data: bdgData } = await _sb.from('budgets')
+      .select('*').eq('user_id', uid);
+    if (bdgData && bdgData.length > 0) {
+      BUDGETS.length = 0;
+      bdgData.forEach(b => BUDGETS.push({
+        icon: b.icon, name: b.name, used: b.used,
+        limit: b.limit_amt, color: b.color, bg: b.bg
+      }));
+    }
+
+    // AFP
+    const { data: afpData } = await _sb.from('afp_data')
+      .select('*').eq('user_id', uid).single();
+    if (afpData) {
+      JUB.saldo = afpData.saldo || 0;
+      JUB.cotizacion = afpData.cotizacion || 0;
+      JUB.afp = afpData.afp || 'AFP Habitat';
+      JUB.aniosCotizados = afpData.anios_cot || 0;
+      if (afpData.nacimiento) {
+        const age = new Date().getFullYear() - new Date(afpData.nacimiento).getFullYear();
+        JUB.edadActual = age;
+      }
+    }
+
+    console.log('✅ Datos cargados desde Supabase');
+  } catch(e) {
+    console.log('ℹ️ Usando datos de demo:', e.message);
+  }
+}
+
+// ── GUARDAR TRANSACCIÓN EN SUPABASE ──
+async function saveTransactionDB(tx) {
+  if (!window._sb || !window.CASHLY_USER) return;
+  try {
+    await _sb.from('transactions').insert({
+      user_id: window.CASHLY_USER.id,
+      name: tx.name, amount: tx.amount,
+      category: tx.cat, type: tx.type,
+      date: new Date().toISOString().split('T')[0],
+      icon: tx.icon, badge: tx.badge, status: tx.status
+    });
+  } catch(e) { console.error('Error guardando tx:', e); }
+}
 </script>
 </body>
 </html>
