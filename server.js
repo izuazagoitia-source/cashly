@@ -7,20 +7,23 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
-// Servir archivos estáticos (index.html, PDF, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta raíz
+// Login page
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// App principal
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Health check para el host
+// Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', app: 'Cashly', version: '1.0.0' });
+  res.json({ status: 'ok', app: 'Cashly', version: '2.0.0' });
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Cashly corriendo en http://localhost:${PORT}`);
+  console.log(`✅ Cashly v2.0 corriendo en http://localhost:${PORT}`);
 });
