@@ -218,13 +218,108 @@
   .goal-used{font-size:13px;font-weight:600;font-family:var(--mono)}
   .goal-limit{font-size:11px;color:var(--text3)}
 
+  /* ── TABLET (≤900px) ── */
   @media(max-width:900px){
     .sidebar{width:60px}
-    .logo-mark,.logo-sub,.nav-label,.nav-item span,.user-name,.user-plan{display:none}
+    .logo-mark,.logo-sub,.nav-label,.nav-item span,.nav-group-arrow,
+    .user-name,.user-plan,.nav-subitem span{display:none}
+    .nav-subitem{padding:8px 0;justify-content:center}
+    .nav-subicon{font-size:16px;width:auto}
     .main{margin-left:60px}
     .summary-grid{grid-template-columns:1fr 1fr}
     .two-col{grid-template-columns:1fr}
     .three-col{grid-template-columns:1fr}
+  }
+
+  /* ── MÓVIL (≤600px) ── */
+  @media(max-width:600px){
+    /* Sidebar oculto — navegación por botón hamburger */
+    .sidebar{
+      position:fixed;left:-100%;width:260px;z-index:200;
+      transition:left .25s ease;box-shadow:4px 0 20px rgba(0,0,0,.3)
+    }
+    .sidebar.open{left:0}
+    /* Mostrar textos en sidebar abierto */
+    .sidebar.open .logo-mark,.sidebar.open .logo-sub,
+    .sidebar.open .nav-label,.sidebar.open .nav-item span,
+    .sidebar.open .nav-group-arrow,.sidebar.open .user-name,
+    .sidebar.open .user-plan,.sidebar.open .nav-subitem span{display:block}
+    .sidebar.open .nav-subitem{padding:8px 20px 8px 36px;justify-content:flex-start}
+    .sidebar.open .nav-subicon{font-size:13px;width:16px}
+
+    /* Overlay oscuro cuando sidebar abierto */
+    .sidebar-overlay{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+      z-index:199;transition:opacity .25s
+    }
+    .sidebar-overlay.open{display:block}
+
+    /* Botón hamburger */
+    .hamburger{
+      display:flex;align-items:center;justify-content:center;
+      width:36px;height:36px;border-radius:8px;cursor:pointer;
+      background:var(--surface2);border:1px solid var(--border);
+      font-size:18px;flex-shrink:0
+    }
+
+    /* Main sin margen */
+    .main{margin-left:0}
+
+    /* Topbar compacto */
+    .topbar{padding:0 16px;gap:10px}
+    .topbar-title{font-size:14px}
+    .topbar-right .btn span{display:none}
+    .topbar-right .btn{padding:7px 10px}
+
+    /* Contenido */
+    .content{padding:16px}
+
+    /* Grids → 1 columna */
+    .summary-grid{grid-template-columns:1fr 1fr;gap:10px}
+    .two-col,.three-col{grid-template-columns:1fr}
+
+    /* Cards más compactas */
+    .card{padding:14px !important}
+    .card-value{font-size:20px !important}
+
+    /* Modales full-width */
+    .modal{width:95vw !important;max-height:90vh;overflow-y:auto;margin:0 auto}
+    .form-row-2{grid-template-columns:1fr}
+
+    /* Ocultar columnas extra en tablas */
+    .hide-mobile{display:none !important}
+
+    /* Paneles */
+    .panel{padding:14px}
+    .panel-header{flex-direction:column;gap:8px;align-items:flex-start}
+
+    /* Tabs scrollables */
+    .tab-bar{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+    .tab{font-size:12px;padding:8px 14px}
+
+    /* Filtros scrollables */
+    .filter-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+    .filter-chip{white-space:nowrap;flex-shrink:0}
+
+    /* Month bar */
+    .month-bar{flex-wrap:nowrap;overflow-x:auto}
+    .month-btn{flex-shrink:0}
+
+    /* Botones en topbar */
+    .btn{font-size:12px}
+
+    /* KPIs patrimonio en 2 cols */
+    #pat-neto-clp{font-size:28px !important}
+
+    /* Tablas horizontalmente scrollables */
+    .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  }
+
+  /* ── MUY PEQUEÑO (≤380px) ── */
+  @media(max-width:380px){
+    .summary-grid{grid-template-columns:1fr}
+    .content{padding:12px}
+    .card-value{font-size:18px !important}
   }
 </style>
 </head>
@@ -299,8 +394,12 @@
 </nav>
 
 <!-- MAIN CONTENT -->
+<!-- Overlay móvil -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <main class="main">
   <div class="topbar">
+    <div class="hamburger" id="hamburger-btn" onclick="toggleSidebar()">☰</div>
     <div class="topbar-title" id="page-title">Balance Personal</div>
     <div class="topbar-right">
       <div style="position:relative;cursor:pointer">
@@ -5911,6 +6010,38 @@ function setTab(el,id){
   ['mensual','comparativo','anual'].forEach(t=>{
     document.getElementById('tab-'+t).style.display=t===id?'block':'none';
   });
+}
+
+// ── SIDEBAR MÓVIL ──
+function toggleSidebar(){
+  const sb  = document.querySelector('.sidebar');
+  const ov  = document.getElementById('sidebar-overlay');
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open', !isOpen);
+  ov.classList.toggle('open', !isOpen);
+  document.body.style.overflow = isOpen ? '' : 'hidden';
+}
+function closeSidebar(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.remove('open');
+  ov.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Mostrar hamburger en móvil
+function checkMobile(){
+  const btn = document.getElementById('hamburger-btn');
+  if(btn) btn.style.display = window.innerWidth <= 600 ? 'flex' : 'none';
+}
+window.addEventListener('resize', checkMobile);
+document.addEventListener('DOMContentLoaded', checkMobile);
+
+// Cerrar sidebar al navegar en móvil
+const _origShowSection = showSection;
+function showSection(id){
+  if(window.innerWidth <= 600) closeSidebar();
+  _origShowSection(id);
 }
 
 // INIT
