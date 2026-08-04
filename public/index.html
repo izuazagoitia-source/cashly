@@ -74,9 +74,9 @@
 
   /* MAIN */
   .main{margin-left:220px;flex:1;min-height:100vh}
-  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-  .topbar-title{font-size:16px;font-weight:500;color:var(--text)}
-  .topbar-right{display:flex;align-items:center;gap:12px}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:12px}
+  .topbar-title{font-size:16px;font-weight:500;color:var(--text);flex:1}
+  .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
   .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--font)}
   .btn-primary{background:var(--accent);color:#fff}
   .btn-primary:hover{background:var(--accent2)}
@@ -231,90 +231,117 @@
     .three-col{grid-template-columns:1fr}
   }
 
-  /* ── HAMBURGER (siempre oculto en desktop) ── */
-  .hamburger{display:none}
-  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
+  /* ── HAMBURGER — oculto en desktop ── */
+  .hamburger{display:none !important}
+  .sidebar-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.55);z-index:199;
+    cursor:pointer
+  }
   .sidebar-overlay.open{display:block}
 
-  /* ── MÓVIL (≤640px) ── */
-  @media(max-width:640px){
-    /* Hamburger visible */
+  /* ── MÓVIL (≤700px) ── */
+  @media(max-width:700px){
+
+    /* Mostrar hamburger */
     .hamburger{
-      display:flex !important;align-items:center;justify-content:center;
-      width:38px;height:38px;border-radius:8px;cursor:pointer;
-      background:rgba(255,255,255,.15);border:none;
-      font-size:20px;color:#fff;flex-shrink:0;margin-right:8px
+      display:flex !important;
+      align-items:center;justify-content:center;
+      width:40px;height:40px;
+      border-radius:8px;
+      background:var(--surface2);
+      border:1px solid var(--border);
+      font-size:22px;
+      cursor:pointer;
+      flex-shrink:0;
+      color:var(--text)
     }
 
-    /* Sidebar drawer */
+    /* Sidebar como drawer lateral */
     .sidebar{
-      position:fixed !important;
-      left:-280px !important;
-      width:260px !important;
-      top:0;bottom:0;
+      position:fixed;
+      top:0;left:-100%;
+      width:260px;
+      height:100%;
+      min-height:100vh;
       z-index:200;
-      transition:left .3s cubic-bezier(.4,0,.2,1);
+      transition:left .28s ease;
       overflow-y:auto;
-      min-height:100vh
+      overflow-x:hidden
     }
-    .sidebar.open{left:0 !important}
+    .sidebar.open{left:0}
 
-    /* Textos visibles cuando sidebar abierto */
+    /* Todos los textos visibles en sidebar abierto */
     .sidebar.open .logo-mark,
     .sidebar.open .logo-sub,
     .sidebar.open .nav-label,
     .sidebar.open .nav-item span,
     .sidebar.open .user-name,
     .sidebar.open .user-plan{display:block !important}
-    .sidebar.open .nav-subitem span{display:inline !important}
     .sidebar.open .nav-group-arrow{display:inline-block !important}
-    .sidebar.open .nav-subitem{padding:8px 20px 8px 36px !important;justify-content:flex-start !important}
+    .sidebar.open .nav-subitem{
+      padding:8px 20px 8px 36px !important;
+      justify-content:flex-start !important
+    }
+    .sidebar.open .nav-subitem span{display:inline !important}
 
-    /* Main ocupa todo el ancho */
+    /* Main ocupa 100% */
     .main{margin-left:0 !important}
 
-    /* Topbar */
-    .topbar{padding:0 12px;gap:8px;display:flex;align-items:center}
-    .topbar-title{font-size:14px;flex:1}
+    /* Topbar compacto */
+    .topbar{padding:0 14px !important;gap:10px}
+    .topbar-title{font-size:14px !important}
     .topbar-right{gap:8px}
-    .topbar-right .btn-primary span,
-    .topbar-right .btn-ghost span{display:none}
 
     /* Contenido */
     .content{padding:14px !important}
 
-    /* Grids */
+    /* Grids adaptativos */
     .summary-grid{grid-template-columns:1fr 1fr !important;gap:10px}
     .two-col,.three-col{grid-template-columns:1fr !important}
 
     /* Cards */
-    .card{padding:12px !important}
+    .card{padding:13px !important}
     .card-value{font-size:19px !important}
-    .card-label{font-size:10px}
 
     /* Modales */
-    .modal{width:96vw !important;max-height:88vh !important;overflow-y:auto !important;padding:20px !important}
+    .modal{width:95vw !important;max-height:90vh !important;
+           overflow-y:auto !important;padding:20px !important}
+    .modal-bg{padding:10px}
     .form-row-2{grid-template-columns:1fr !important}
 
-    /* Paneles */
-    .panel{padding:12px}
-    .panel-header{flex-wrap:wrap;gap:8px}
+    /* Tabs scrollables horizontalmente */
+    .tab-bar{
+      overflow-x:auto !important;
+      white-space:nowrap !important;
+      -webkit-overflow-scrolling:touch;
+      flex-wrap:nowrap !important;
+      padding-bottom:4px
+    }
+    .tab{font-size:12px;padding:8px 13px;flex-shrink:0}
 
-    /* Tabs y filtros scrollables */
-    .tab-bar{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px;flex-wrap:nowrap}
-    .tab{font-size:12px;padding:8px 12px;flex-shrink:0}
-    .filter-bar,.month-bar{flex-wrap:nowrap !important;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    /* Filtros scrollables */
+    .filter-bar,.month-bar{
+      flex-wrap:nowrap !important;
+      overflow-x:auto !important;
+      -webkit-overflow-scrolling:touch
+    }
     .filter-chip,.month-btn{white-space:nowrap;flex-shrink:0}
 
+    /* Paneles */
+    .panel{padding:14px}
+    .panel-header{flex-wrap:wrap;gap:6px}
+
     /* Tablas scrollables */
-    .panel table,.table-scroll{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .panel table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
   }
 
-  /* ── MUY PEQUEÑO (≤380px) ── */
-  @media(max-width:380px){
+  /* ── MUY PEQUEÑO (≤390px) ── */
+  @media(max-width:390px){
     .summary-grid{grid-template-columns:1fr !important}
     .content{padding:10px !important}
     .card-value{font-size:17px !important}
+    .hamburger{width:36px;height:36px;font-size:18px}
   }
 </style>
 </head>
