@@ -247,14 +247,15 @@
     .hamburger{
       display:flex !important;
       align-items:center;justify-content:center;
-      width:40px;height:40px;
-      border-radius:8px;
-      background:var(--surface2);
-      border:1px solid var(--border);
-      font-size:22px;
+      width:48px;height:48px;
+      border-radius:10px;
+      background:var(--accent);
+      border:none;
+      font-size:26px;
       cursor:pointer;
       flex-shrink:0;
-      color:var(--text)
+      color:#fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.15)
     }
 
     /* Sidebar como drawer lateral */
@@ -288,9 +289,9 @@
     /* Main ocupa 100% */
     .main{margin-left:0 !important}
 
-    /* Topbar compacto */
-    .topbar{padding:0 14px !important;gap:10px}
-    .topbar-title{font-size:14px !important}
+    /* Topbar más alto en móvil */
+    .topbar{padding:0 14px !important;gap:12px;height:68px !important}
+    .topbar-title{font-size:15px !important;font-weight:600}
     .topbar-right{gap:8px}
 
     /* Contenido */
@@ -341,7 +342,7 @@
     .summary-grid{grid-template-columns:1fr !important}
     .content{padding:10px !important}
     .card-value{font-size:17px !important}
-    .hamburger{width:36px;height:36px;font-size:18px}
+    .hamburger{width:44px;height:44px;font-size:24px}
   }
 </style>
 </head>
