@@ -231,95 +231,90 @@
     .three-col{grid-template-columns:1fr}
   }
 
-  /* ── MÓVIL (≤600px) ── */
-  @media(max-width:600px){
-    /* Sidebar oculto — navegación por botón hamburger */
-    .sidebar{
-      position:fixed;left:-100%;width:260px;z-index:200;
-      transition:left .25s ease;box-shadow:4px 0 20px rgba(0,0,0,.3)
-    }
-    .sidebar.open{left:0}
-    /* Mostrar textos en sidebar abierto */
-    .sidebar.open .logo-mark,.sidebar.open .logo-sub,
-    .sidebar.open .nav-label,.sidebar.open .nav-item span,
-    .sidebar.open .nav-group-arrow,.sidebar.open .user-name,
-    .sidebar.open .user-plan,.sidebar.open .nav-subitem span{display:block}
-    .sidebar.open .nav-subitem{padding:8px 20px 8px 36px;justify-content:flex-start}
-    .sidebar.open .nav-subicon{font-size:13px;width:16px}
+  /* ── HAMBURGER (siempre oculto en desktop) ── */
+  .hamburger{display:none}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
+  .sidebar-overlay.open{display:block}
 
-    /* Overlay oscuro cuando sidebar abierto */
-    .sidebar-overlay{
-      display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
-      z-index:199;transition:opacity .25s
-    }
-    .sidebar-overlay.open{display:block}
-
-    /* Botón hamburger */
+  /* ── MÓVIL (≤640px) ── */
+  @media(max-width:640px){
+    /* Hamburger visible */
     .hamburger{
-      display:flex;align-items:center;justify-content:center;
-      width:36px;height:36px;border-radius:8px;cursor:pointer;
-      background:var(--surface2);border:1px solid var(--border);
-      font-size:18px;flex-shrink:0
+      display:flex !important;align-items:center;justify-content:center;
+      width:38px;height:38px;border-radius:8px;cursor:pointer;
+      background:rgba(255,255,255,.15);border:none;
+      font-size:20px;color:#fff;flex-shrink:0;margin-right:8px
     }
 
-    /* Main sin margen */
-    .main{margin-left:0}
+    /* Sidebar drawer */
+    .sidebar{
+      position:fixed !important;
+      left:-280px !important;
+      width:260px !important;
+      top:0;bottom:0;
+      z-index:200;
+      transition:left .3s cubic-bezier(.4,0,.2,1);
+      overflow-y:auto;
+      min-height:100vh
+    }
+    .sidebar.open{left:0 !important}
 
-    /* Topbar compacto */
-    .topbar{padding:0 16px;gap:10px}
-    .topbar-title{font-size:14px}
-    .topbar-right .btn span{display:none}
-    .topbar-right .btn{padding:7px 10px}
+    /* Textos visibles cuando sidebar abierto */
+    .sidebar.open .logo-mark,
+    .sidebar.open .logo-sub,
+    .sidebar.open .nav-label,
+    .sidebar.open .nav-item span,
+    .sidebar.open .user-name,
+    .sidebar.open .user-plan{display:block !important}
+    .sidebar.open .nav-subitem span{display:inline !important}
+    .sidebar.open .nav-group-arrow{display:inline-block !important}
+    .sidebar.open .nav-subitem{padding:8px 20px 8px 36px !important;justify-content:flex-start !important}
+
+    /* Main ocupa todo el ancho */
+    .main{margin-left:0 !important}
+
+    /* Topbar */
+    .topbar{padding:0 12px;gap:8px;display:flex;align-items:center}
+    .topbar-title{font-size:14px;flex:1}
+    .topbar-right{gap:8px}
+    .topbar-right .btn-primary span,
+    .topbar-right .btn-ghost span{display:none}
 
     /* Contenido */
-    .content{padding:16px}
+    .content{padding:14px !important}
 
-    /* Grids → 1 columna */
-    .summary-grid{grid-template-columns:1fr 1fr;gap:10px}
-    .two-col,.three-col{grid-template-columns:1fr}
+    /* Grids */
+    .summary-grid{grid-template-columns:1fr 1fr !important;gap:10px}
+    .two-col,.three-col{grid-template-columns:1fr !important}
 
-    /* Cards más compactas */
-    .card{padding:14px !important}
-    .card-value{font-size:20px !important}
+    /* Cards */
+    .card{padding:12px !important}
+    .card-value{font-size:19px !important}
+    .card-label{font-size:10px}
 
-    /* Modales full-width */
-    .modal{width:95vw !important;max-height:90vh;overflow-y:auto;margin:0 auto}
-    .form-row-2{grid-template-columns:1fr}
-
-    /* Ocultar columnas extra en tablas */
-    .hide-mobile{display:none !important}
+    /* Modales */
+    .modal{width:96vw !important;max-height:88vh !important;overflow-y:auto !important;padding:20px !important}
+    .form-row-2{grid-template-columns:1fr !important}
 
     /* Paneles */
-    .panel{padding:14px}
-    .panel-header{flex-direction:column;gap:8px;align-items:flex-start}
+    .panel{padding:12px}
+    .panel-header{flex-wrap:wrap;gap:8px}
 
-    /* Tabs scrollables */
-    .tab-bar{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-    .tab{font-size:12px;padding:8px 14px}
+    /* Tabs y filtros scrollables */
+    .tab-bar{overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:2px;flex-wrap:nowrap}
+    .tab{font-size:12px;padding:8px 12px;flex-shrink:0}
+    .filter-bar,.month-bar{flex-wrap:nowrap !important;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .filter-chip,.month-btn{white-space:nowrap;flex-shrink:0}
 
-    /* Filtros scrollables */
-    .filter-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-    .filter-chip{white-space:nowrap;flex-shrink:0}
-
-    /* Month bar */
-    .month-bar{flex-wrap:nowrap;overflow-x:auto}
-    .month-btn{flex-shrink:0}
-
-    /* Botones en topbar */
-    .btn{font-size:12px}
-
-    /* KPIs patrimonio en 2 cols */
-    #pat-neto-clp{font-size:28px !important}
-
-    /* Tablas horizontalmente scrollables */
-    .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    /* Tablas scrollables */
+    .panel table,.table-scroll{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
   }
 
   /* ── MUY PEQUEÑO (≤380px) ── */
   @media(max-width:380px){
-    .summary-grid{grid-template-columns:1fr}
-    .content{padding:12px}
-    .card-value{font-size:18px !important}
+    .summary-grid{grid-template-columns:1fr !important}
+    .content{padding:10px !important}
+    .card-value{font-size:17px !important}
   }
 </style>
 </head>
@@ -2403,6 +2398,7 @@ let currentFilter = 'todos';
 
 // NAVIGATION
 function showSection(id) {
+  if(window.innerWidth<=640) closeSidebar();
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('section-'+id).classList.add('active');
@@ -6014,8 +6010,9 @@ function setTab(el,id){
 
 // ── SIDEBAR MÓVIL ──
 function toggleSidebar(){
-  const sb  = document.querySelector('.sidebar');
-  const ov  = document.getElementById('sidebar-overlay');
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  if(!sb||!ov) return;
   const isOpen = sb.classList.contains('open');
   sb.classList.toggle('open', !isOpen);
   ov.classList.toggle('open', !isOpen);
@@ -6024,24 +6021,10 @@ function toggleSidebar(){
 function closeSidebar(){
   const sb = document.querySelector('.sidebar');
   const ov = document.getElementById('sidebar-overlay');
+  if(!sb||!ov) return;
   sb.classList.remove('open');
   ov.classList.remove('open');
   document.body.style.overflow = '';
-}
-
-// Mostrar hamburger en móvil
-function checkMobile(){
-  const btn = document.getElementById('hamburger-btn');
-  if(btn) btn.style.display = window.innerWidth <= 600 ? 'flex' : 'none';
-}
-window.addEventListener('resize', checkMobile);
-document.addEventListener('DOMContentLoaded', checkMobile);
-
-// Cerrar sidebar al navegar en móvil
-const _origShowSection = showSection;
-function showSection(id){
-  if(window.innerWidth <= 600) closeSidebar();
-  _origShowSection(id);
 }
 
 // INIT
